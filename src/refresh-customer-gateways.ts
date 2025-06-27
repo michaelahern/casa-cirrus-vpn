@@ -8,7 +8,7 @@ export class RefreshCustomerGateways extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        new lambda.Function(this, 'RefreshCustomerGateways', {
+        const myFunc = new lambda.Function(this, 'RefreshCustomerGateways', {
             runtime: lambda.Runtime.NODEJS_22_X,
             code: lambda.Code.fromAsset(path.join(path.dirname(fileURLToPath(import.meta.url)), '../dist/lambdas/refresh-customer-gateways')),
             handler: 'module.handler',
@@ -18,5 +18,15 @@ export class RefreshCustomerGateways extends cdk.Stack {
             tracing: lambda.Tracing.ACTIVE,
             architecture: lambda.Architecture.ARM_64
         });
+
+        myFunc.addToRolePolicy(new cdk.aws_iam.PolicyStatement({
+            actions: [
+                'ec2:CreateCustomerGateway',
+                'ec2:DescribeCustomerGateways',
+                'ec2:DescribeVpnConnections',
+                'ec2:ModifyVpnConnection'
+            ],
+            resources: ['*']
+        }));
     }
 }
