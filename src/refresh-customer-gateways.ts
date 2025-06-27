@@ -7,12 +7,11 @@ export class RefreshCustomerGateways extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const myFunc = new lambda_nodejs.NodejsFunction(this, 'function', {
+        const myFunc = new lambda_nodejs.NodejsFunction(this, 'RefreshCustomerGateways', {
             // https://github.com/aws/aws-cdk/pull/21802#issuecomment-1249940400
             entry: new URL(import.meta.url.replace(/(.*)(\..+)/, '$1.' + 'function' + '$2')).pathname,
             runtime: lambda.Runtime.NODEJS_22_X,
             timeout: cdk.Duration.minutes(2),
-            functionName: 'RefreshCustomerGateways',
             memorySize: 192,
             tracing: lambda.Tracing.ACTIVE,
             architecture: lambda.Architecture.ARM_64,
