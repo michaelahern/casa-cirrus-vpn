@@ -1,22 +1,27 @@
 import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as lambda_nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Construct } from 'constructs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 export class RefreshCustomerGateways extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const myFunc = new lambda.Function(this, 'RefreshCustomerGateways', {
+        const myFunc = new lambda_nodejs.NodejsFunction(this, 'function', {
+            // https://github.com/aws/aws-cdk/pull/21802#issuecomment-1249940400
+            entry: new URL(import.meta.url.replace(/(.*)(\..+)/, '$1.' + 'function' + '$2')).pathname,
             runtime: lambda.Runtime.NODEJS_22_X,
-            code: lambda.Code.fromAsset(path.join(path.dirname(fileURLToPath(import.meta.url)), '../dist/lambdas/refresh-customer-gateways')),
-            handler: 'module.handler',
-            timeout: cdk.Duration.minutes(1),
+            timeout: cdk.Duration.minutes(2),
             functionName: 'RefreshCustomerGateways',
             memorySize: 192,
             tracing: lambda.Tracing.ACTIVE,
-            architecture: lambda.Architecture.ARM_64
+            architecture: lambda.Architecture.ARM_64,
+            insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_333_0,
+            bundling: {
+                sourceMap: true,
+                target: 'es2022',
+                format: lambda_nodejs.OutputFormat.ESM
+            }
         });
 
         myFunc.addToRolePolicy(new cdk.aws_iam.PolicyStatement({
