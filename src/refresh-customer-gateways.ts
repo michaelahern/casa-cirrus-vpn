@@ -7,7 +7,7 @@ export class RefreshCustomerGateways extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const myFunc = new lambda_nodejs.NodejsFunction(this, 'RefreshCustomerGateways', {
+        const func = new lambda_nodejs.NodejsFunction(this, 'RefreshCustomerGateways', {
             // https://github.com/aws/aws-cdk/pull/21802#issuecomment-1249940400
             entry: new URL(import.meta.url.replace(/(.*)(\..+)/, '$1.' + 'function' + '$2')).pathname,
             runtime: lambda.Runtime.NODEJS_22_X,
@@ -23,7 +23,7 @@ export class RefreshCustomerGateways extends cdk.Stack {
             }
         });
 
-        myFunc.addToRolePolicy(new cdk.aws_iam.PolicyStatement({
+        func.addToRolePolicy(new cdk.aws_iam.PolicyStatement({
             actions: [
                 'ec2:CreateCustomerGateway',
                 'ec2:DescribeCustomerGateways',
