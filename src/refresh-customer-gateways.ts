@@ -25,8 +25,8 @@ export class RefreshCustomerGateways extends cdk.Stack {
             tracing: lambda.Tracing.ACTIVE,
             architecture: lambda.Architecture.ARM_64,
             insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_333_0,
-            // https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Application-Signals-Enable-LambdaMain.html#CloudWatch-Application-Signals-Lambda-CDK
             layers: [
+                // https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Application-Signals-Enable-LambdaMain.html#CloudWatch-Application-Signals-Lambda-CDK
                 lambda.LayerVersion.fromLayerVersionArn(this, 'AwsLambdaLayerForOtel', `arn:aws:lambda:${props?.env?.region}:615299751070:layer:AWSOpenTelemetryDistroJs:8`)
             ],
             environment: {
@@ -48,7 +48,9 @@ export class RefreshCustomerGateways extends cdk.Stack {
 
         new scheduler.Schedule(this, 'Schedule', {
             schedule: scheduler.ScheduleExpression.rate(cdk.Duration.hours(1)),
-            target: new schedulerTargets.LambdaInvoke(func)
+            target: new schedulerTargets.LambdaInvoke(func, {
+                retryAttempts: 0
+            })
         });
     }
 }
