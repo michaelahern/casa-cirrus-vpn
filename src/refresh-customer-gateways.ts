@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as lambda_nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as lambdaNodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as scheduler from 'aws-cdk-lib/aws-scheduler';
 import * as schedulerTargets from 'aws-cdk-lib/aws-scheduler-targets';
 import { Construct } from 'constructs';
@@ -11,21 +12,25 @@ export class RefreshCustomerGateways extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const func = new lambda_nodejs.NodejsFunction(this, 'Function', {
+        const src = path.dirname(fileURLToPath(import.meta.url));
+        const func = new lambdaNodejs.NodejsFunction(this, 'Function', {
             // https://github.com/aws/aws-cdk/pull/21802#issuecomment-1249940400
-            entry: path.join(path.dirname(fileURLToPath(import.meta.url)), 'refresh-customer-gateways.function.ts'),
+            entry: path.join(src, 'refresh-customer-gateways.function.ts'),
             runtime: lambda.Runtime.NODEJS_22_X,
+            bundling: {
+                format: lambdaNodejs.OutputFormat.ESM
+            },
             timeout: cdk.Duration.minutes(2),
-            memorySize: 192,
+            memorySize: 256,
             tracing: lambda.Tracing.ACTIVE,
             architecture: lambda.Architecture.ARM_64,
             insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_333_0,
-            adotInstrumentation: {
-                layerVersion: lambda.AdotLayerVersion.fromJavaScriptSdkLayerVersion(lambda.AdotLambdaLayerJavaScriptSdkVersion.LATEST),
-                execWrapper: lambda.AdotLambdaExecWrapper.REGULAR_HANDLER
-            },
-            bundling: {
-                format: lambda_nodejs.OutputFormat.ESM
+            // https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Application-Signals-Enable-LambdaMain.html#CloudWatch-Application-Signals-Lambda-CDK
+            layers: [
+                lambda.LayerVersion.fromLayerVersionArn(this, 'AwsLambdaLayerForOtel', `arn:aws:lambda:${props?.env?.region}:615299751070:layer:AWSOpenTelemetryDistroJs:8`)
+            ],
+            environment: {
+                AWS_LAMBDA_EXEC_WRAPPER: '/opt/otel-instrument'
             }
         });
 
@@ -38,6 +43,8 @@ export class RefreshCustomerGateways extends cdk.Stack {
             ],
             resources: ['*']
         }));
+
+        func.role?.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchLambdaApplicationSignalsExecutionRolePolicy'));
 
         new scheduler.Schedule(this, 'Schedule', {
             schedule: scheduler.ScheduleExpression.rate(cdk.Duration.hours(1)),
