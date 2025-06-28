@@ -1,16 +1,21 @@
 import { EC2 } from '@aws-sdk/client-ec2';
 import { promises as dns } from 'dns';
 
-export const handler = async () => {
-    const CASA_GLOBAL: Record<string, string> = {
-        65001: 'gateway.canyaa.casa',
-        65020: 'gateway.mobilia.casa'
-    };
+const CASA_GLOBAL: Record<string, string> = {
+    65001: 'gateway.canyaa.casa',
+    65020: 'gateway.mobilia.casa'
+};
 
+export const handler = async () => {
     const ec2 = new EC2();
     const gateways = await ec2.describeCustomerGateways();
 
-    gateways.CustomerGateways?.forEach(async (gateway) => {
+    if (!gateways.CustomerGateways) {
+        console.log('No customer gateways found!');
+        return;
+    }
+
+    await Promise.all(gateways.CustomerGateways.map(async (gateway) => {
         if (!gateway.BgpAsn || !gateway.IpAddress || !gateway.CustomerGatewayId) {
             return;
         }
@@ -48,5 +53,5 @@ export const handler = async () => {
                 CustomerGatewayId: gatewayNew.CustomerGateway?.CustomerGatewayId
             });
         }
-    });
+    }));
 };

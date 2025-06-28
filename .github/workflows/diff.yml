@@ -11,6 +11,9 @@ permissions:
 jobs:
   diff:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        region: [ us-east-2 ]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,7 +23,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: ${{ github.run_id }}
-          aws-region: us-east-2
+          aws-region: ${{ matrix.region }}
       - run: npm ci
       - run: npm run build
       - run: npm run cdk diff RefreshCustomerGateways
