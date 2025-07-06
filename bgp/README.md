@@ -1,13 +1,13 @@
 # UniFi & Border Gateway Protocol (BGP)
 
-### Documentation
+## Documentation
 
  * [UniFi - BGP](https://help.ui.com/hc/en-us/articles/16271338193559-UniFi-Border-Gateway-Protocol-BGP)
  * [FRRouting - BGP](https://docs.frrouting.org/en/latest/bgp.html)
 
-### UniFi Console & [VTY Shell](https://docs.frrouting.org/en/latest/vtysh.html)
+## UniFi Console & [VTY Shell](https://docs.frrouting.org/en/latest/vtysh.html)
 
-```
+```text
 % ssh root@192.168.1.1
 # vtysh
 # show running-config
