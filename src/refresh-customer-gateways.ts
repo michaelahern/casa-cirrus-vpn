@@ -23,7 +23,7 @@ export class RefreshCustomerGateways extends cdk.Stack {
             timeout: cdk.Duration.minutes(2),
             memorySize: 256,
             tracing: lambda.Tracing.ACTIVE,
-            architecture: lambda.Architecture.ARM_64,
+            architecture: lambda.Architecture.X86_64,
             insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_333_0,
             layers: [
                 // https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Application-Signals-Enable-LambdaMain.html#CloudWatch-Application-Signals-Lambda-CDK
