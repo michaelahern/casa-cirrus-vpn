@@ -18,7 +18,4 @@ jobs:
           node-version: 24.x
           cache: npm
       - uses: astral-sh/setup-uv@v6
-        with:
-          enable-cache: true
-          ignore-nothing-to-cache: true
       - run: npm ci
