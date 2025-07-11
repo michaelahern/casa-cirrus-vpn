@@ -1,5 +1,5 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-24",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24",
   "features": {
     "ghcr.io/devcontainers/features/aws-cli:1": {},
     "ghcr.io/jsburckhardt/devcontainer-features/uv:1": {}
