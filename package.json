@@ -16,7 +16,7 @@
   "devDependencies": {
     "@aws-sdk/client-ec2": "^3",
     "@eslint/json": "^0",
-    "@eslint/markdown": "^6",
+    "@eslint/markdown": "^7",
     "@stylistic/eslint-plugin": "^5",
     "@types/node": "^22",
     "aws-cdk": "^2",
