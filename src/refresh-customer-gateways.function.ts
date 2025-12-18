@@ -22,6 +22,10 @@ export const handler = async () => {
 
         if (gateway.BgpAsn in CASA_GLOBAL && gateway.State === 'available') {
             const casaHostname = CASA_GLOBAL[gateway.BgpAsn];
+            if (casaHostname === undefined) {
+                return;
+            }
+
             console.log(`[${casaHostname}] ${gateway.CustomerGatewayId}-->${gateway.IpAddress}`);
 
             const casaIpAddress = await dns.resolve4(casaHostname);
