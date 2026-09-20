@@ -16,7 +16,7 @@ export class RefreshCustomerGateways extends cdk.Stack {
         const func = new lambdaNodejs.NodejsFunction(this, 'Function', {
             // https://github.com/aws/aws-cdk/pull/21802#issuecomment-1249940400
             entry: path.join(src, 'refresh-customer-gateways.function.ts'),
-            runtime: lambda.Runtime.NODEJS_22_X,
+            runtime: lambda.Runtime.NODEJS_24_X,
             bundling: {
                 format: lambdaNodejs.OutputFormat.ESM
             },
@@ -24,10 +24,10 @@ export class RefreshCustomerGateways extends cdk.Stack {
             memorySize: 256,
             tracing: lambda.Tracing.ACTIVE,
             architecture: lambda.Architecture.ARM_64,
-            insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_333_0,
+            insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_498_0,
             layers: [
                 // https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Application-Signals-Enable-LambdaMain.html#CloudWatch-Application-Signals-Lambda-CDK
-                lambda.LayerVersion.fromLayerVersionArn(this, 'AwsLambdaLayerForOtel', `arn:aws:lambda:${props?.env?.region}:615299751070:layer:AWSOpenTelemetryDistroJs:8`)
+                lambda.LayerVersion.fromLayerVersionArn(this, 'AwsLambdaLayerForOtel', `arn:aws:lambda:${props?.env?.region}:615299751070:layer:AWSOpenTelemetryDistroJs:15`)
             ],
             environment: {
                 AWS_LAMBDA_EXEC_WRAPPER: '/opt/otel-instrument'
