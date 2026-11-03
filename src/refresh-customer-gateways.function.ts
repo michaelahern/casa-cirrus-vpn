@@ -47,13 +47,18 @@ export const handler = async () => {
                 IpAddress: casaIpAddress[0]
             });
 
-            const vpnConnections = await ec2.describeVpnConnections();
-            const vpnConnectionToUpdate = vpnConnections.VpnConnections?.find(vpn =>
-                vpn.CustomerGatewayId === gateway.CustomerGatewayId
-            );
+            const vpnConnections = await ec2.describeVpnConnections({
+                Filters: [{ Name: 'customer-gateway-id', Values: [gateway.CustomerGatewayId] }]
+            });
+            const vpnConnectionToUpdate = vpnConnections.VpnConnections?.find(vpn => vpn.State === 'available');
+
+            if (!vpnConnectionToUpdate?.VpnConnectionId) {
+                console.log(`[${casaHostname}] No VPN connection attached to ${gateway.CustomerGatewayId}, skipping`);
+                return;
+            }
 
             await ec2.modifyVpnConnection({
-                VpnConnectionId: vpnConnectionToUpdate?.CustomerGatewayId,
+                VpnConnectionId: vpnConnectionToUpdate.VpnConnectionId,
                 CustomerGatewayId: gatewayNew.CustomerGateway?.CustomerGatewayId
             });
         }
